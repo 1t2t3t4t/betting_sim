@@ -22,15 +22,17 @@ fn perform_bet_strat(
             } else {
                 context.total_money
             };
+            let before_bet_tot = context.total_money;
             context.total_money -= bet_amount;
+
             let res = utils::bet_result(env, bet_amount);
             if let Some(win_amount) = res {
                 context.total_money += win_amount;
-                context.records.push(common::BetRecord::Win(win_amount));
+                context.records.push(common::BetRecord::Win(win_amount - bet_amount, before_bet_tot));
                 context.consec_bet_loses.clear();
             } else {
                 context.consec_bet_loses.push(bet_amount);
-                context.records.push(common::BetRecord::Lose(bet_amount));
+                context.records.push(common::BetRecord::Lose(bet_amount, before_bet_tot));
             }
         }
         Bet::Down => (),

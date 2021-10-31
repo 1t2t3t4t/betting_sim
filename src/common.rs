@@ -14,8 +14,8 @@ impl Default for Environment {
 
 #[derive(Debug)]
 pub enum BetRecord {
-    Win(u64),
-    Lose(u64),
+    Win(u64, u64),
+    Lose(u64, u64),
 }
 
 #[derive(Debug)]
