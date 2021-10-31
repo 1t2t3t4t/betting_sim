@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use rand::{thread_rng, Rng};
 
-use crate::{BetContext, Environment};
+use crate::{common::BetContext, common::Environment};
 
 pub(crate) fn is_broke(context: &BetContext) -> bool {
     context.total_money == 0

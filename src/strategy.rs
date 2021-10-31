@@ -1,4 +1,4 @@
-use crate::BetContext;
+use crate::common::BetContext;
 
 pub enum Bet {
     Hit(u64),
