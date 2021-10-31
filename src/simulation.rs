@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::strategy::Bet;
 
 use crate::common::{BetContext, BetRecord, Environment};

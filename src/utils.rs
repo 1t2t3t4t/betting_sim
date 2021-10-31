@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use rand::{thread_rng, Rng};
 
 use crate::{common::BetContext, common::Environment};
