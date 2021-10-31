@@ -17,7 +17,7 @@ impl Environment {
 impl Default for Environment {
     fn default() -> Self {
         Self {
-            win_rate: 0.4,
+            win_rate: 0.45,
             return_ratio: 2.0,
             start_amount: 10000,
         }
@@ -34,6 +34,7 @@ pub enum BetRecord {
 pub struct BetContext {
     pub start_money: u64,
     pub total_money: u64,
+    pub max_total_money: u64,
     pub consec_bet_loses: Vec<u64>,
     pub records: Vec<BetRecord>,
 }
@@ -43,6 +44,7 @@ impl BetContext {
         Self {
             start_money,
             total_money: start_money,
+            max_total_money: start_money,
             ..Default::default()
         }
     }
@@ -53,6 +55,7 @@ impl Default for BetContext {
         Self {
             start_money: 50000,
             total_money: 50000,
+            max_total_money: 50000,
             consec_bet_loses: Vec::with_capacity(10),
             records: Vec::new(),
         }

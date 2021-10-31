@@ -7,13 +7,7 @@ use crate::common::{BetContext, BetRecord, Environment};
 use crate::strategy::Strategy;
 use crate::utils;
 
-use std::sync::Arc;
-
-pub(crate) fn perform_bet_strat(
-    strat: &Arc<dyn Strategy>,
-    context: &mut BetContext,
-    env: &Environment,
-) {
+pub(crate) fn perform_bet_strat(strat: &dyn Strategy, context: &mut BetContext, env: &Environment) {
     let bet = strat.bet(context);
     match bet {
         Bet::Hit(bet_amount) => {
@@ -32,6 +26,9 @@ pub(crate) fn perform_bet_strat(
                     .records
                     .push(BetRecord::Win(win_amount - bet_amount, before_bet_tot));
                 context.consec_bet_loses.clear();
+                if context.total_money > context.max_total_money {
+                    context.max_total_money = context.total_money;
+                }
             } else {
                 context.consec_bet_loses.push(bet_amount);
                 context
@@ -46,7 +43,7 @@ pub(crate) type SimulationResult = HashMap<&'static str, BetContext>;
 
 pub(crate) fn simulate(
     env: Environment,
-    strategies: &[Arc<dyn Strategy>],
+    strategies: &[Box<dyn Strategy>],
     context_builder: impl Fn() -> BetContext,
 ) -> SimulationResult {
     let mut context_map = strategies
@@ -60,7 +57,7 @@ pub(crate) fn simulate(
             if utils::is_broke(context) {
                 continue;
             }
-            perform_bet_strat(strat, context, &env)
+            perform_bet_strat(strat.as_ref(), context, &env)
         }
     }
     context_map
