@@ -9,7 +9,7 @@ use strategy::Strategy;
 
 use crate::{
     common::Environment,
-    strategy::{martingale::MartinGaleStrat, DummyStrat},
+    strategy::{martingale::MartinGaleStrat, TenPercentStrat},
 };
 
 mod common;
@@ -22,7 +22,7 @@ fn boxed<S: 'static + Strategy>(strat: S) -> Box<dyn Strategy> {
 }
 
 fn strategies_builder() -> Vec<Box<dyn Strategy>> {
-    vec![boxed(MartinGaleStrat::new()), boxed(DummyStrat)]
+    vec![boxed(MartinGaleStrat::new()), boxed(TenPercentStrat)]
 }
 
 fn main() {
@@ -39,20 +39,20 @@ fn main() {
     let (tx, rx) = sync::mpsc::channel();
     for env in envs.clone() {
         let strategies = strategies_builder();
-        let clone_tx = tx.clone();
-        std::thread::spawn(move || {
-            let sim_result =
-                simulation::simulate(env, &strategies, || BetContext::new(env.start_amount));
-            clone_tx.send(sim_result).unwrap();
-        });
+        for strategy in strategies {
+            let clone_tx = tx.clone();
+            std::thread::spawn(move || {
+                let sim_result =
+                    simulation::simulate(env, strategy.as_ref(), || BetContext::new(strategy.name(), env.start_amount));
+                clone_tx.send(sim_result).unwrap();
+            });
+        }
     }
 
     for _ in 0..envs.len() {
-        let result_map = rx.recv().unwrap();
-        for (strat, result) in &result_map {
-            let file_name = format!("{}_{:#2}", strat, result.start_money);
-            write_summary_report(format!("./out/{}/{}.txt", strat, file_name), result);
-        }
+        let result = rx.recv().unwrap();
+        let file_name = format!("{}_{:#2}", result.strat_name, result.start_money);
+        write_summary_report(format!("./out/{}/{}.txt", result.strat_name, file_name), &result);
     }
 
     println!(

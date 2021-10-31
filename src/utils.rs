@@ -12,8 +12,8 @@ pub(crate) fn reach_goal(context: &BetContext) -> bool {
     context.total_money >= context.start_money * 2
 }
 
-pub(crate) fn should_end(context: &HashMap<&str, BetContext>) -> bool {
-    context.iter().all(|v| is_broke(v.1))
+pub(crate) fn should_end(context: &BetContext) -> bool {
+    is_broke(context) || reach_goal(context)
 }
 
 pub(crate) fn bet_result(env: &Environment, bet_amount: u64) -> Option<u64> {

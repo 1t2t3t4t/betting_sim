@@ -7,7 +7,22 @@ use crate::common::{BetContext, BetRecord, Environment};
 use crate::strategy::Strategy;
 use crate::utils;
 
-pub(crate) fn perform_bet_strat(strat: &dyn Strategy, context: &mut BetContext, env: &Environment) {
+pub(crate) type SimulationResult = BetContext;
+
+pub(crate) fn simulate(
+    env: Environment,
+    strategy: &dyn Strategy,
+    context_builder: impl Fn() -> BetContext,
+) -> SimulationResult {
+    let mut context = context_builder();
+
+    while !utils::should_end(&context) {
+        perform_bet_strat(strategy, &mut context, &env)
+    }
+    context
+}
+
+fn perform_bet_strat(strat: &dyn Strategy, context: &mut BetContext, env: &Environment) {
     let bet = strat.bet(context);
     match bet {
         Bet::Hit(bet_amount) => {
@@ -37,28 +52,4 @@ pub(crate) fn perform_bet_strat(strat: &dyn Strategy, context: &mut BetContext, 
             }
         }
     }
-}
-
-pub(crate) type SimulationResult = HashMap<&'static str, BetContext>;
-
-pub(crate) fn simulate(
-    env: Environment,
-    strategies: &[Box<dyn Strategy>],
-    context_builder: impl Fn() -> BetContext,
-) -> SimulationResult {
-    let mut context_map = strategies
-        .iter()
-        .map(|v| (v.name(), context_builder()))
-        .collect::<HashMap<&str, BetContext>>();
-
-    while !utils::should_end(&context_map) {
-        for strat in strategies {
-            let context = context_map.get_mut(strat.name()).unwrap();
-            if utils::is_broke(context) {
-                continue;
-            }
-            perform_bet_strat(strat.as_ref(), context, &env)
-        }
-    }
-    context_map
 }

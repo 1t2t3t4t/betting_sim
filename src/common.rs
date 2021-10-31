@@ -32,6 +32,7 @@ pub enum BetRecord {
 
 #[derive(Debug)]
 pub struct BetContext {
+    pub strat_name: String,
     pub start_money: u64,
     pub total_money: u64,
     pub max_total_money: u64,
@@ -40,8 +41,9 @@ pub struct BetContext {
 }
 
 impl BetContext {
-    pub fn new(start_money: u64) -> Self {
+    pub fn new(strat_name: &str, start_money: u64) -> Self {
         Self {
+            strat_name: strat_name.to_string(),
             start_money,
             total_money: start_money,
             max_total_money: start_money,
@@ -53,6 +55,7 @@ impl BetContext {
 impl Default for BetContext {
     fn default() -> Self {
         Self {
+            strat_name: String::new(),
             start_money: 50000,
             total_money: 50000,
             max_total_money: 50000,
