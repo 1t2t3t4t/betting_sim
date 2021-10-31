@@ -9,7 +9,7 @@ pub(crate) fn is_broke(context: &BetContext) -> bool {
 }
 
 pub(crate) fn reach_goal(context: &BetContext) -> bool {
-    context.total_money >= 100000
+    context.total_money >= context.start_money * 2
 }
 
 pub(crate) fn should_end(context: &HashMap<&str, BetContext>) -> bool {

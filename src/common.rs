@@ -1,6 +1,17 @@
+#[derive(Clone, Copy)]
 pub struct Environment {
     pub win_rate: f64,
     pub return_ratio: f64,
+    pub start_amount: u64,
+}
+
+impl Environment {
+    pub fn new(start_amount: u64) -> Self {
+        Self {
+            start_amount,
+            ..Default::default()
+        }
+    }
 }
 
 impl Default for Environment {
@@ -8,6 +19,7 @@ impl Default for Environment {
         Self {
             win_rate: 0.4,
             return_ratio: 2.0,
+            start_amount: 10000,
         }
     }
 }
@@ -20,15 +32,27 @@ pub enum BetRecord {
 
 #[derive(Debug)]
 pub struct BetContext {
+    pub start_money: u64,
     pub total_money: u64,
     pub consec_bet_loses: Vec<u64>,
     pub records: Vec<BetRecord>,
 }
 
+impl BetContext {
+    pub fn new(start_money: u64) -> Self {
+        Self {
+            start_money,
+            total_money: start_money,
+            ..Default::default()
+        }
+    }
+}
+
 impl Default for BetContext {
     fn default() -> Self {
         Self {
-            total_money: 10000,
+            start_money: 50000,
+            total_money: 50000,
             consec_bet_loses: Vec::with_capacity(10),
             records: Vec::new(),
         }
